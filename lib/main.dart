@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ualberta_campus_map/campus.dart';
 import 'package:ualberta_campus_map/building.dart';
+import 'package:ualberta_campus_map/coffee_shop.dart';
 import 'feature.dart';
 
 void main() => runApp(MyApp());
@@ -32,13 +33,22 @@ class MainMapPage extends StatefulWidget {
 
 class _MainMapPageState extends State<MainMapPage> {
   Completer<GoogleMapController> _controller = Completer();
+  // Campuses.
   Campus _selectedCampus;
   Campus _northCampus;
   Campus _southCampus;
   Campus _campusStJean;
   Campus _augustanaCampus;
+
+  // Feature lists.
   List<Building> _buildings = List();
+  List<CoffeeShop> _coffeeShops = List();
+
+  // Feature display marker flags.
   bool _showBuildings = true;
+  bool _showCoffeeShop = false;
+
+  // Set of markers to display.
   Set<Marker> _markers = Set();
 
   @protected
@@ -63,6 +73,9 @@ class _MainMapPageState extends State<MainMapPage> {
     _buildings.add(Building("Wilson Climbing Centre", LatLng(53.523221, -113.526165), context));
     _buildings.add(Building("Administration", LatLng(53.525267, -113.525473), context));
     _buildings.add(Building("Agriculture/Forestry Centre", LatLng(53.526121, -113.528029), context));
+
+    // Add coffee shops
+    _coffeeShops.add(CoffeeShop("ECHA Starbucks", LatLng(53.522277, -113.526477), context));
   }
 
   Future<void> _goToCampus() async {
@@ -79,6 +92,8 @@ class _MainMapPageState extends State<MainMapPage> {
     // Add enabled markers for enabled features
     if (_showBuildings)
       _addMarkers(_buildings);
+    if (_showCoffeeShop)
+      _addMarkers(_coffeeShops);
   }
 
   void _addMarkers(List<Feature> _featuresToAdd) {
@@ -143,16 +158,22 @@ class _MainMapPageState extends State<MainMapPage> {
                 value: _showBuildings,
                 activeColor: Colors.amber.withOpacity(0.8),
                 onChanged: (bool value) {
-                  setState(() {_showBuildings = !_showBuildings;});
+                  setState(() {
+                    _showBuildings = !_showBuildings;
+                    _updateMarkers();
+                  });
                 },
                 secondary: Icon(Icons.business, color: Colors.amber.withOpacity(0.95),),
               ),
               CheckboxListTile(
                 title: const Text('Coffee Shops'),
-                value: _showBuildings,
+                value: _showCoffeeShop,
                 activeColor: Colors.amber.withOpacity(0.8),
                 onChanged: (bool value) {
-                  setState(() {_showBuildings = !_showBuildings;});
+                  setState(() {
+                    _showCoffeeShop = !_showCoffeeShop;
+                    _updateMarkers();
+                  });
                 },
                 secondary: Icon(Icons.local_cafe, color: Colors.amber.withOpacity(0.95),),
               ),
